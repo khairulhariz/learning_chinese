@@ -1,6 +1,6 @@
 // Service worker: lets Learning Chinese open offline after the first visit.
 // The page itself is network-first (so updates show up), everything else is cache-first.
-const CACHE = 'hanzi-drills-91de73eebe';
+const CACHE = 'hanzi-drills-4774b20900';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js'];
 self.addEventListener('install', e => {
