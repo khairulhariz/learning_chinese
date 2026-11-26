@@ -1667,7 +1667,7 @@ function home(){
     <span class="stats"><span>${st ? `<b>${st}</b> day streak` : 'Start a streak today'}</span><span><b>${dp.known}</b> of ${dp.pool.length} learned</span><span><b>${dp.started}</b> started</span></span></span></button>`;
   let h = `<div class="qgrid" style="margin-bottom:22px">${daily}
     <button class="qcard feature" data-start="mixed"><b>Mixed test</b><small>A bit of everything, like a real class quiz: meaning, pinyin, tones, gaps and sentence building.</small></button>
-    <button class="qcard feature" data-start="examlist"><b>Class test practice</b><small>Mid-semester test, your quiz papers, a listening test (HSK style) and the class test paper, with words from the lessons you choose.</small></button>
+    <button class="qcard feature" data-start="examlist"><b>Class test practice</b><small>One full test with every question type from your quizzes, class test and mid-semester outline, including HSK-style listening. Words from the lessons you choose.</small></button>
     ${nWeak ? `<button class="qcard feature" data-start="weak"><b>My mistakes (${nWeak})</b><small>Drill only the characters you have missed before.</small></button>` : ''}
   </div><div class="skills">`;
   for (const [k,[zh,en]] of Object.entries(SKILLS)) {
@@ -1756,12 +1756,15 @@ function start(id){
 }
 
 // ---------- class test practice ----------
-const NUMS = '一二三四五六七八九十';
+const NUMS = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
 const gapify = t => esc(t).replace('＿', '<span class="gap">？</span>');
 const exLines = d => `<div class="exd">${d.map(([who, t]) => `<div>${who ? `<span class="who">${esc(who)}：</span>` : ''}<span class="hz">${gapify(t)}</span></div>`).join('')}</div>`;
 const why = x => x.why ? `<span class="why">${esc(x.why)}</span>` : '';
+const partHead = part => `<p class="label exh"><span class="hz">${NUMS[part.num != null ? part.num : CLASS.indexOf(part)]}、${part.zh}</span> · ${esc(part.en)}</p>`;
 function examItem(part, x){
-  const head = `<p class="label exh"><span class="hz">${NUMS[paperOf(part).indexOf(part)]}、${part.zh}</span> · ${esc(part.en)}</p>`;
+  // a part that mixes several question types hands each item to its own type, under the part's heading
+  if (part.kind === 'combo') return examItem({ ...x.src, zh:part.zh, en:part.en, pts:part.pts, num:CLASS.indexOf(part) }, x.x);
+  const head = partHead(part);
   const base = { keys:'', pts: part.pts, head };
   const kind = part.kind === 'lmix' ? x.sub : part.kind;
   const lopts = os => shuffle(os).map((o, k) => ({ label:`<span class="ltag">${'ABCD'[k]}</span>${esc(o)}`, val:o }));
@@ -1835,14 +1838,6 @@ QP('q4').items = EXAM.find(p => p.kind === 'order').items;
 QP('q6').items.forEach(x => { x.py = x.a.map(pyLetters); });
 QUIZ.forEach(p => p.items.forEach(x => { if (x.l == null) x.l = lessonOf((JSON.stringify(x).match(/[一-鿿]+/g) || []).join('|')); }));
 // mid-semester test, quiz L1-5 paper and the HSK-style listening test reuse the banks above
-const PAPERS = [
-  {id:'M', name:'Mid-semester test', sub:'Listening, characters, answers, sentences and word order, like the mid-semester outline.', parts:MID},
-  {id:'Q', name:'Quiz paper · like Quiz 2', sub:'6 parts, 2 points per answer, like the Lesson 6–7 quiz.', parts:QUIZ},
-  {id:'K', name:'Quiz paper · like Quiz L1–5', sub:'Listening, a box of characters, a box of sentences and word order.', parts:QL15},
-  {id:'H', name:'Listening test · HSK style', sub:'Words, sentences, dialogues and short texts read aloud. Headphones help.', parts:LISTEN},
-  {id:'T', name:'Test paper · like your first class test', sub:'Tone changes, measure words, grammar, questions, word order and dialogues.', parts:EXAM},
-];
-const paperOf = part => PAPERS.find(P => P.parts.includes(part)).parts;
 const LP = id => LISTEN.find(p => p.id === id), MP = id => MID.find(p => p.id === id), KP = id => QL15.find(p => p.id === id);
 const LWORDS = uniq([...CH.filter(c => !NAMES.includes(c.h) && c.n <= 4).map(c => c.h), ...QUIZ_WORDS, ...WORDS.filter(w => w.w.length === 2 && w.w[0] === w.w[1]).map(w => w.w)]).map(w => ({ w, l: lessonOf(w) }));
 LP('h1').items = LWORDS; KP('k1').items = LWORDS;
@@ -1860,6 +1855,26 @@ DIALOGS.forEach(dg => dg.lines.forEach((ln, i) => { const nx = dg.lines[i + 1];
     SB.push({ d:[['A', ln.zh], ['B', '＿' + end]], a: end ? nx.zh.slice(0, -1) : nx.zh, l: lessonOf(ln.zh + nx.zh) }); } }));
 KP('k3').items = SB;
 const examPool = p => p.items.filter(x => lessons().includes(x.l));
+// Our own class test: every question type from the class quizzes, the test paper, the mid-semester outline and HSK listening,
+// one part per type. Items come from the banks in data.js (EXAM, QUIZ, MID, QL15, LISTEN).
+const SRC = id => [...EXAM, ...QUIZ, ...MID, ...QL15, ...LISTEN].find(p => p.id === id);
+const fromSrc = (id, zh, en, pts, full, src, more = {}) => { const s = SRC(src); return { id, zh, en, pts, full, kind:s.kind, items:s.items, group:s.group, extra:s.extra, pinyin:s.pinyin, ...more }; };
+const CLASS = [
+  fromSrc('c1', '听后选择', 'Listening: words, sentences and dialogues', 2, 10, 'm1'),
+  fromSrc('c2', '听短文', 'Listening: a short text with questions', 2, 5, 'h4'),
+  fromSrc('c3', '选择正确的拼音', 'Tone changes of 不 and 一', 1, 5, 't1'),
+  fromSrc('c4', '选字组词', 'Choose characters to form words', 1, 5, 'm2'),
+  fromSrc('c5', '选择合适的量词', 'Measure words', 1, 5, 't2'),
+  { id:'c6', zh:'选词填空', en:'Choose the right word for the gap', pts:1, full:10, kind:'combo',
+    items:[...SRC('t3').items.map(x => ({ src:SRC('t3'), x, l:x.l })), ...SRC('t4').items.map(x => ({ src:SRC('t4'), x, l:x.l }))] },
+  fromSrc('c7', '完成句子', 'Complete the text with the words in the box', 1, 10, 'q3'),
+  fromSrc('c8', '选句填空', 'Fill in the blanks with the given sentences', 1, 5, 'k3'),
+  fromSrc('c9', '就划线部分提问', 'Ask about the underlined part', 2, 3, 't5'),
+  fromSrc('c10', '连词成句', 'Make a sentence with the given words (ABCD)', 2, 5, 'm5'),
+  fromSrc('c11', '改写句子', 'Change into affirmative-negative questions', 2, 2, 'q6'),
+  fromSrc('c12', '阅读理解', 'Reading', 1, 5, 'q5'),
+  fromSrc('c13', '完成对话', 'Finish the dialogue (type it)', 1, 5, 't7'),
+];
 const examSize = (p, x) => p.kind === 'passage' ? x.a.length : p.kind === 'read' || p.kind === 'lread' ? x.qs.length : 1;
 function examPick(p, lim){ // whole texts only, up to lim questions (always at least one)
   if (p.kind === 'lmix') { // listening mix: words first, then sentences, then dialogues
@@ -1872,33 +1887,29 @@ function examPick(p, lim){ // whole texts only, up to lim questions (always at l
   shuffle(examPool(p)).forEach(x => { const k = examSize(p, x); if (!out.length || n + k <= lim) { out.push(x); n += k; } });
   return out;
 }
-const PAPER_OPEN = new Set(['M']);
 function examList(){
   setTab('home'); $('.settings').hidden = false; Q = null;
   const units = p => examPool(p).reduce((n, x) => n + examSize(p, x), 0);
-  const cards = parts => parts.map((p, i) => { const n = units(p), texts = examPool(p).length;
+  const cards = CLASS.map((p, i) => { const n = units(p), texts = examPool(p).length;
     const count = p.kind === 'passage' ? `${texts} text${texts === 1 ? '' : 's'}, ${n} gaps` : p.kind === 'read' || p.kind === 'lread' ? `${texts} text${texts === 1 ? '' : 's'}, ${n} questions` : `${n} question${n === 1 ? '' : 's'}`;
-    return `<button class="qcard" data-start="exam-${p.id}" ${n ? '' : 'disabled style="opacity:.55"'}><b><span class="hz">${NUMS[i]}、${p.zh}</span></b><small>${esc(p.en)} · ${n ? count : p.id === 't2' ? 'needs 第4课 (measure words)' : p.id === 'q6' ? 'needs 第2课 or later' : 'none in these lessons'}</small></button>`; }).join('');
-  const fullT = () => { const n = EXAM.reduce((s, p) => s + Math.min(p.full, examPool(p).length), 0), pts = EXAM.reduce((s, p) => s + p.pts * Math.min(p.full, examPool(p).length), 0); return `${n} questions, scored out of ${pts} points like the real test.`; };
+    return `<button class="qcard" data-start="exam-${p.id}" ${n ? '' : 'disabled style="opacity:.55"'}><b><span class="hz">${NUMS[i]}、${p.zh}</span></b><small>${esc(p.en)} · ${n ? count : p.id === 'c5' ? 'needs 第4课 (measure words)' : p.id === 'c11' ? 'needs 第2课 or later' : 'none in these lessons'}</small></button>`; }).join('');
   view.innerHTML = `<div class="examlist"><div class="qtop" style="margin-bottom:12px"><span class="label">Class test practice</span><button class="btn ghost" id="home">All quizzes</button></div>
-    <p class="note" style="margin:0 0 4px">Questions use only words from the lessons ticked above. Tick one lesson to focus on it, or several to mix them. Tap a paper to open it.</p>
-    ${PAPERS.map(P => `<details class="paper" data-p="${P.id}" ${PAPER_OPEN.has(P.id) ? 'open' : ''}><summary><b>${esc(P.name)}</b><small>${esc(P.sub)}</small></summary>
-      <div class="qgrid"><button class="qcard feature" data-start="exam-${P.id}" ${P.parts.some(p => examPool(p).length) ? '' : 'disabled'}><b>Full paper</b><small>${P.id === 'T' ? fullT() : `All ${P.parts.length} parts in order, scored in points like the real paper.`}</small></button>
-      ${cards(P.parts)}</div></details>`).join('')}</div>`;
-  view.querySelectorAll('details.paper').forEach(d => d.addEventListener('toggle', () => { if (d.open) PAPER_OPEN.add(d.dataset.p); else PAPER_OPEN.delete(d.dataset.p); }));
+    <p class="note" style="margin:0 0 12px">One test with every question type from your quizzes, the class test, the mid-semester outline and HSK listening. Questions use only words from the lessons ticked above.</p>
+    <div class="qgrid"><button class="qcard feature" data-start="exam-C" ${CLASS.some(p => examPool(p).length) ? '' : 'disabled'}><b>Full paper</b><small>All ${CLASS.length} parts in order: listening, characters, grammar, sentences, reading and writing. Scored out of about 100 points.</small></button>
+    ${cards}</div></div>`;
 }
 function startExam(id){
-  const all = PAPERS.flatMap(P => P.parts), part = all.find(p => 'exam-' + p.id === id), P = PAPERS.find(P => 'exam-' + P.id === id);
-  if (!part && !P) return examList();
-  const items = part ? examBuild(part, qlen()) : P.parts.flatMap(p => examBuild(p, p.full));
+  const part = CLASS.find(p => 'exam-' + p.id === id);
+  if (!part && id !== 'exam-C') return examList();
+  const items = part ? examBuild(part, qlen()) : CLASS.flatMap(p => examBuild(p, p.full));
   if (!items.length) return examList();
   window.scrollTo(0, 0);
-  Q = { id, name: part ? part.en : 'Full paper · ' + P.name, items, i:0, score:0, missed:[], points:0, maxPts: items.reduce((n, x) => n + x.pts, 0) };
+  Q = { id, name: part ? part.en : 'Full paper', items, i:0, score:0, missed:[], points:0, maxPts: items.reduce((n, x) => n + x.pts, 0) };
   render();
 }
 const chunk = (a, n) => a.reduce((o, x, i) => (i % n ? o[o.length - 1].push(x) : o.push([x]), o), []);
 function groupItem(p, g){
-  const head = `<p class="label exh"><span class="hz">${NUMS[paperOf(p).indexOf(p)]}、${p.zh}</span> · ${esc(p.en)}</p>`;
+  const head = partHead(p);
   const base = { keys:'', head, pts: p.pts * g.length, unit: p.pts, type:'passage' };
   const done = x => ({ ...base, ...x, reveal:`<span class="hz">${esc(x.x.s.split('＿').map((t, i) => t + (x.x.a[i] || '')).join('').replace(/\n/g, ' '))}</span>` });
   if (p.kind === 'charbox') {
