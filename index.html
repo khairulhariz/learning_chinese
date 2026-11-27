@@ -136,8 +136,8 @@ nav.tabs #install{color:var(--jade)}
 .readbox{text-align:left;font-family:var(--hanzi);font-size:1.25rem;line-height:1.9;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:6px 0 10px;max-height:40vh;overflow:auto}
 .lplay{display:inline-flex;align-items:center;gap:6px;margin:4px 0 8px} .lplay svg{width:18px;height:18px}
 button.playing{animation:sndpulse 1s ease-in-out infinite} @keyframes sndpulse{50%{opacity:.5}}
-#soundmsg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(520px,calc(100% - 32px));box-sizing:border-box;display:flex;gap:10px;align-items:flex-start;background:#7a2e22;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:50;font-size:.95rem;line-height:1.4}
-#soundmsg button{flex:none;background:transparent;border:0;color:#fff;font-size:1rem;cursor:pointer;padding:0 2px}
+#soundmsg{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));pointer-events:none;transform:translateX(-50%);width:min(520px,calc(100% - 32px));box-sizing:border-box;display:flex;gap:10px;align-items:flex-start;background:#7a2e22;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:50;font-size:.95rem;line-height:1.4}
+#soundmsg button{pointer-events:auto;flex:none;background:transparent;border:0;color:#fff;font-size:1rem;cursor:pointer;padding:0 2px}
 .opt .ltag{font-family:var(--body);font-size:.8rem;color:var(--muted);margin-right:10px;vertical-align:middle}
 details.paper{margin-top:14px} details.paper>summary{cursor:pointer;list-style:none;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)} details.paper>summary::-webkit-details-marker{display:none} details.paper>summary b{display:block} details.paper>summary small{color:var(--muted)} details.paper[open]>summary{border-color:var(--jade)} details.paper .qgrid{margin-top:10px}
 .tile .abc{font-family:var(--body);font-size:.85rem;color:var(--muted);margin-right:4px}
@@ -1321,6 +1321,53 @@ const LISTEN = [
     {d:[['男','你们班有多少学生？'],['女','十五个。三位老师教我们。']], q:'几位老师教他们？', o:['三位','五位','十五位']},
   ]},
   {id:'h4', zh:'听短文', en:'Hear a short text, answer the questions', pts:2, full:7, kind:'lread', items:[]},
+  {id:'h5', zh:'听问题选回答', en:'Hear a question, choose the best reply', pts:2, full:5, kind:'lqa', items:[  // hand-written pairs; app.html adds the question-and-answer pairs from the dialogues
+    {q:'谢谢！', a:'不客气。'},
+    {q:'对不起！', a:'没关系。'},
+    {q:'老师好！', a:'你们好！'},
+    {q:'再见！', a:'再见！'},
+    {q:'请进！', a:'谢谢！'},
+    {q:'请坐！', a:'谢谢老师！'},
+    {q:'你忙吗？', a:'我不忙。'},
+    {q:'你累吗？', a:'我很累。'},
+    {q:'你渴吗？', a:'我不渴，我很饿。'},
+    {q:'你爸爸妈妈好吗？', a:'他们都很好。'},
+    {q:'你哥哥忙吗？', a:'他很忙。'},
+    {q:'我很饿，你呢？', a:'我也很饿。'},
+    {q:'你吃什么？', a:'我吃饺子。'},
+    {q:'你喝什么？', a:'我喝咖啡。'},
+    {q:'你买什么？', a:'我买词典。'},
+    {q:'你喝茶吗？', a:'我不喝茶，我喝果汁。'},
+    {q:'你吃米饭吗？', a:'我不吃米饭，我吃面条。'},
+    {q:'你要什么？', a:'我要两瓶矿泉水。'},
+    {q:'你换多少钱？', a:'我换一百美元。'},
+    {q:'一杯咖啡多少钱？', a:'十五块。'},
+    {q:'一本词典多少钱？', a:'九十八块。'},
+    {q:'你要一碗面条吗？', a:'我要两碗。'},
+    {q:'你去哪儿？', a:'我去邮局。'},
+    {q:'你的宿舍在哪儿？', a:'在十号楼。'},
+    {q:'你去银行吗？', a:'不去，我去超市。'},
+    {q:'你知道书店在哪儿吗？', a:'对不起，我不知道。'},
+    {q:'这是什么？', a:'这是我的词典。'},
+    {q:'你是韩国人吗？', a:'不是，我是德国人。'},
+    {q:'你学习什么？', a:'我学习汉语。'},
+    {q:'那是你的书吗？', a:'不是，那是我同学的书。'},
+    {q:'你女朋友漂亮吗？', a:'她漂亮极了。'},
+    {q:'你们的教室大吗？', a:'我们的教室很大。'},
+    {q:'你最近身体怎么样？', a:'挺好的。'},
+    {q:'你的宿舍里有没有空调？', a:'有空调。'},
+    {q:'你家离学校远吗？', a:'不远，很近。'},
+    {q:'你的成绩怎么样？', a:'马马虎虎。'},
+    {q:'你喜欢中国吗？', a:'我非常喜欢中国。'},
+    {q:'你有没有同桌？', a:'有，我的同桌是法国人。'},
+    {q:'你叫什么名字？', a:'我叫小雨。'},
+    {q:'您贵姓？', a:'我姓王。'},
+    {q:'你是哪国人？', a:'我是中国人。'},
+    {q:'你住在哪儿？', a:'我住在留学生宿舍。'},
+    {q:'你每天下午做什么？', a:'我常常休息。'},
+    {q:'你跟谁一起去？', a:'我跟朋友一起去。'},
+    {q:'你们班有几位老师？', a:'有两位老师。'},
+    {q:'谁教你们汉语？', a:'王老师教我们汉语。'}]},
 ];
 
 
@@ -1755,6 +1802,7 @@ const QUIZZES = [
   {id:'pinyin', name:'Read it', d:'See a character, pick the correct pinyin.', skill:'read'},
   {id:'tones', name:'Tones', d:'Same sound, five tones. Choose the right one.', skill:'read'},
   {id:'sentmean', name:'Sentence meaning', d:'Read a full sentence and pick its meaning.', skill:'read'},
+  {id:'exam-c2', name:'Listen and reply', d:'Hear a question in Chinese, then pick the best answer, like a real conversation.', skill:'listen'},
   {id:'listen', name:'Listening', d:'Hear a character, tap the one you heard.', skill:'listen'},
   {id:'fill', name:'Fill the gap', d:'Choose the character that completes the sentence (吗, 呢, 也, 都…).', skill:'use'},
   {id:'build', name:'Sentence builder', d:'Put the word tiles in order to match the English.', skill:'use'},
@@ -1889,6 +1937,12 @@ function examItem(part, x){
       .forEach(w => { if (opts.length < 3 && w !== x.w && !opts.includes(w)) opts.push(w); });
     return { ...base, type:'mc', hz:true, small:n > 1, prompt:`${head}<p class="q">Listen and choose the word you hear</p>${playHtml()}`,
       audio:[['', x.w]], opts: lopts([x.w, ...opts]), ans:x.w, speak:x.w, reveal:`<span class="hz">${x.w}</span> <b>${wordPy(x.w)}</b> <span>${esc(wordMean(x.w))}</span>` }; }
+  if (kind === 'lqa') { const k = qkey(x.q), pool = shuffle(examPool(LP('h5'))), all = shuffle(QA);
+    const opts = [], ok = y => y.a !== x.a && normZh(y.a) !== normZh(x.a) && !opts.includes(y.a);
+    [...pool.filter(y => qkey(y.q) !== k), ...all.filter(y => qkey(y.q) !== k)].forEach(y => { if (opts.length < 3 && ok(y)) opts.push(y.a); });
+    return { ...base, type:'mc', hz:true, small:true, prompt:`${head}<p class="q">Listen to the question, then choose the best reply</p>${playHtml()}`,
+      audio:[['', x.q]], opts: lopts([x.a, ...opts]), ans:x.a, speak:x.q + x.a,
+      reveal:`<span class="hz">问：${esc(x.q)}</span> <b>${pyOf(x.q.replace(/[？]/g, ''))}</b><span class="why hz">答：${esc(x.a)}</span>` }; }
   if (kind === 'lsent') { const f = x.f, full = f.s.replace('＿', f.a), others = shuffle(f.o.filter(o => o !== f.a)).slice(0, 2).map(o => f.s.replace('＿', o));
     return { ...base, type:'mc', hz:true, small:true, prompt:`${head}<p class="q">Listen and choose the sentence you hear</p>${playHtml()}`,
       audio:[['', full]], opts: lopts([full, ...others]), ans:full, speak:full, reveal:`<span class="hz">${full}</span> <b>${f.p}</b> <span>${esc(f.m)}</span>` }; }
@@ -1966,26 +2020,36 @@ DIALOGS.forEach(dg => dg.lines.forEach((ln, i) => { const nx = dg.lines[i + 1];
   if (nx && /？$/.test(ln.zh) && [...nx.zh].length <= 14) { const end = /[。！？]$/.test(nx.zh) ? nx.zh.slice(-1) : '';
     SB.push({ d:[['A', ln.zh], ['B', '＿' + end]], a: end ? nx.zh.slice(0, -1) : nx.zh, l: lessonOf(ln.zh + nx.zh) }); } }));
 KP('k3').items = SB;
+// hear a question, choose the reply: every question line followed by its answer line
+const QA = [], qaSeen = new Set();
+LP('h5').items.forEach(x => { qaSeen.add(x.q + '|' + x.a); QA.push({ ...x, l: lessonOf(x.q + x.a) }); });
+SB.forEach(x => { const last = x.d[x.d.length - 1], prev = x.d[x.d.length - 2];
+  if (!prev || !last[1].includes('＿') || prev[1].includes('＿') || !/？$/.test(prev[1]) || /[¥0-9]/.test(prev[1])) return;
+  const a = last[1].replace('＿', x.a), k = prev[1] + '|' + a;
+  if (!qaSeen.has(k)) { qaSeen.add(k); QA.push({ q:prev[1], a, l:x.l }); } });
+LP('h5').items = QA;
+const qkey = q => { const m = q.match(/什么|哪儿|哪国|多少|几|谁|怎么样|呢|没有|(.)不\1|吗/); return m ? m[0].replace(/^(.)不\1$/, 'X不X') : '?'; };
 const examPool = p => p.items.filter(x => lessons().includes(x.l));
 // Our own class test: every question type from the class quizzes, the test paper, the mid-semester outline and HSK listening,
 // one part per type. Items come from the banks in data.js (EXAM, QUIZ, MID, QL15, LISTEN).
 const SRC = id => [...EXAM, ...QUIZ, ...MID, ...QL15, ...LISTEN].find(p => p.id === id);
 const fromSrc = (id, zh, en, pts, full, src, more = {}) => { const s = SRC(src); return { id, zh, en, pts, full, kind:s.kind, items:s.items, group:s.group, extra:s.extra, pinyin:s.pinyin, ...more }; };
 const CLASS = [
-  fromSrc('c1', '听后选择', 'Listening: words, sentences and dialogues', 2, 10, 'm1'),
-  fromSrc('c2', '听短文', 'Listening: a short text with questions', 2, 5, 'h4'),
-  fromSrc('c3', '选择正确的拼音', 'Tone changes of 不 and 一', 1, 5, 't1'),
-  fromSrc('c4', '选字组词', 'Choose characters to form words', 1, 5, 'm2'),
-  fromSrc('c5', '选择合适的量词', 'Measure words', 1, 5, 't2'),
-  { id:'c6', zh:'选词填空', en:'Choose the right word for the gap', pts:1, full:10, kind:'combo',
+  fromSrc('c1', '听后选择', 'Listening: words, sentences and dialogues', 2, 8, 'm1'),
+  fromSrc('c2', '听问题选回答', 'Listening: hear a question, choose the reply', 2, 5, 'h5'),
+  fromSrc('c3', '听短文', 'Listening: a short text with questions', 2, 5, 'h4'),
+  fromSrc('c4', '选择正确的拼音', 'Tone changes of 不 and 一', 1, 5, 't1'),
+  fromSrc('c5', '选字组词', 'Choose characters to form words', 1, 5, 'm2'),
+  fromSrc('c6', '选择合适的量词', 'Measure words', 1, 5, 't2'),
+  { id:'c7', zh:'选词填空', en:'Choose the right word for the gap', pts:1, full:10, kind:'combo',
     items:[...SRC('t3').items.map(x => ({ src:SRC('t3'), x, l:x.l })), ...SRC('t4').items.map(x => ({ src:SRC('t4'), x, l:x.l }))] },
-  fromSrc('c7', '完成句子', 'Complete the text with the words in the box', 1, 10, 'q3'),
-  fromSrc('c8', '选句填空', 'Fill in the blanks with the given sentences', 1, 5, 'k3'),
-  fromSrc('c9', '就划线部分提问', 'Ask about the underlined part', 2, 3, 't5'),
-  fromSrc('c10', '连词成句', 'Make a sentence with the given words (ABCD)', 2, 5, 'm5'),
-  fromSrc('c11', '改写句子', 'Change into affirmative-negative questions', 2, 2, 'q6'),
-  fromSrc('c12', '阅读理解', 'Reading', 1, 5, 'q5'),
-  fromSrc('c13', '完成对话', 'Finish the dialogue (type it)', 1, 5, 't7'),
+  fromSrc('c8', '完成句子', 'Complete the text with the words in the box', 1, 10, 'q3'),
+  fromSrc('c9', '选句填空', 'Fill in the blanks with the given sentences', 1, 5, 'k3'),
+  fromSrc('c10', '就划线部分提问', 'Ask about the underlined part', 2, 3, 't5'),
+  fromSrc('c11', '连词成句', 'Make a sentence with the given words (ABCD)', 2, 5, 'm5'),
+  fromSrc('c12', '改写句子', 'Change into affirmative-negative questions', 2, 2, 'q6'),
+  fromSrc('c13', '阅读理解', 'Reading', 1, 5, 'q5'),
+  fromSrc('c14', '完成对话', 'Finish the dialogue (type it)', 1, 5, 't7'),
 ];
 const examSize = (p, x) => p.kind === 'passage' ? x.a.length : p.kind === 'read' || p.kind === 'lread' ? x.qs.length : 1;
 function examPick(p, lim){ // whole texts only, up to lim questions (always at least one)
@@ -2004,7 +2068,7 @@ function examList(){
   const units = p => examPool(p).reduce((n, x) => n + examSize(p, x), 0);
   const cards = CLASS.map((p, i) => { const n = units(p), texts = examPool(p).length;
     const count = p.kind === 'passage' ? `${texts} text${texts === 1 ? '' : 's'}, ${n} gaps` : p.kind === 'read' || p.kind === 'lread' ? `${texts} text${texts === 1 ? '' : 's'}, ${n} questions` : `${n} question${n === 1 ? '' : 's'}`;
-    return `<button class="qcard" data-start="exam-${p.id}" ${n ? '' : 'disabled style="opacity:.55"'}><b><span class="hz">${NUMS[i]}、${p.zh}</span></b><small>${esc(p.en)} · ${n ? count : p.id === 'c5' ? 'needs 第4课 (measure words)' : p.id === 'c11' ? 'needs 第2课 or later' : 'none in these lessons'}</small></button>`; }).join('');
+    return `<button class="qcard" data-start="exam-${p.id}" ${n ? '' : 'disabled style="opacity:.55"'}><b><span class="hz">${NUMS[i]}、${p.zh}</span></b><small>${esc(p.en)} · ${n ? count : p.id === 'c6' ? 'needs 第4课 (measure words)' : p.id === 'c12' ? 'needs 第2课 or later' : 'none in these lessons'}</small></button>`; }).join('');
   view.innerHTML = `<div class="examlist"><div class="qtop" style="margin-bottom:12px"><span class="label">Class test practice</span><button class="btn ghost" id="home">All quizzes</button></div>
     <p class="note" style="margin:0 0 12px">One test with every question type from your quizzes, the class test, the mid-semester outline and HSK listening. Questions use only words from the lessons ticked above.</p>
     <div class="qgrid"><button class="qcard feature" data-start="exam-C" ${CLASS.some(p => examPool(p).length) ? '' : 'disabled'}><b>Full paper</b><small>All ${CLASS.length} parts in order: listening, characters, grammar, sentences, reading and writing. Scored out of about 100 points.</small></button>
