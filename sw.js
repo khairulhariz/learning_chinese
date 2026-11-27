@@ -1,6 +1,6 @@
 // Service worker: lets Learning Chinese open offline after the first visit.
 // The page itself is network-first (so updates show up), everything else is cache-first.
-const CACHE = 'hanzi-drills-e1ea7066e7';
+const CACHE = 'hanzi-drills-181d68b4f0';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js'];
 self.addEventListener('install', e => {
@@ -12,6 +12,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  // Sound: leave online audio and partial (Range) requests to the browser. Caching them here broke playback.
+  if (req.headers.has('range') || /youdao\.com|translate_tts|\.(mp3|m4a|ogg|wav)(\?|$)/i.test(req.url)) return;
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('index.html', copy)); return r; })
       .catch(() => caches.match('index.html')));
